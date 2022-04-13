@@ -1,0 +1,138 @@
+#import library
+from collections import deque
+class Tree_Node:
+    def __init__(self, data):
+        self.data = data
+    
+    # Generate child nodes from the given node by moving the blank space
+    def child(self):
+        Row, Coloum = self.find(self.data, '_')
+        Moves_list = [[Row, Coloum - 1], [Row, Coloum + 1], [Row - 1, Coloum], [Row + 1, Coloum]]
+        children = []
+        
+        for i in Moves_list:
+            child = self.swap_the_space(self.data, Row, Coloum, i[0], i[1])
+            if child is not None:
+                child_node = Tree_Node(child)
+                children.append(child_node)
+        return children
+
+    def swap_the_space(self, puz, Row1, Coloum1, Row2, Coloum2):
+        # Move the blank space in the given direction and if the position value are out of range the return None
+        if Row2 >= 0 and Row2 < 3 and Coloum2 >= 0 and Coloum2 < 3:
+            temp_puz = []
+            temp_puz = self.copy(puz)
+            temp = temp_puz[Row2][Coloum2]
+            temp_puz[Row2][Coloum2] = temp_puz[Row1][Coloum1]
+            temp_puz[Row1][Coloum1] = temp
+            return temp_puz
+        else:
+            return None
+
+    def copy(self, root):
+        # copy function to create a similar matrix of the given node
+        temp = []
+        for i in root:
+            t = []
+            for j in i:
+                t.append(j)
+            temp.append(t)
+        return temp
+
+    def find(self, puz, space):
+        #find the position of the blank space
+        for i in range(0, 3):
+            for j in range(0, 3):
+                if puz[i][j] == space:
+                    return i, j
+
+
+class Puzzle:
+    def __init__(self):
+        self.stack= deque()
+
+        self.queue= deque()
+        self.closed = []
+
+    def take_input(self):
+        # Accepts the puzzle from the user
+        puz = []
+        for i in range(0, 3):
+            temp = input().split(" ")
+            puz.append(temp)
+        return puz
+
+
+#------------------------------------------------------------------------------
+
+    def process_BFS(self):
+        # take the start and the end states from user
+        print("enter the start state matrix \n")
+        start = self.take_input()
+        print("enter the goal state matrix \n")
+        goal = self.take_input()
+        start = Tree_Node(start)
+        self.queue.appendleft(start)
+        print("\n\n")
+
+        while True:
+            v = self.queue.pop()
+            flag=True
+            # check if v visited or not
+            for i in self.closed:
+                if(i.data == v.data):
+                    flag=False
+                    break                
+            if (flag):
+                self.closed.append(v)
+                for i in v.child():
+                    self.queue.appendleft(i)
+                print("==================================================\n")
+                for i in v.data:
+                    for j in i:
+                        print(j, end=" ")
+                    print("")
+            if (v.data == goal):
+                break
+
+    def process_DFS(self):
+        # take the start and the end states from user
+        print("enter the start state matrix \n")
+        start_ = self.take_input()
+        print("enter the goal state matrix \n")
+        goal_ = self.take_input()
+        start_ = Tree_Node(start_)
+        self.stack.append(start_)
+        print("\n\n")
+
+        while True:
+            v = self.stack.pop()
+            flag=True
+            # check if v visited or not
+            for i in self.closed:
+                if(i.data == v.data):
+                    flag=False
+                    break                
+            if (flag):
+                self.closed.append(v)
+                for i in v.child():
+                    self.stack.append(i)
+                print("==================================================\n")
+                for i in v.data:
+                    for j in i:
+                        print(j, end=" ")
+                    print("")
+            if (v.data == goal_):
+                break
+
+puz = Puzzle()
+print(" Enter 1 for Breadth First Search or 2 for Depth First Search")
+choice = input()
+if (choice == "1"):
+    print("Breadth First Search")
+    puz.process_BFS()
+else: 
+    
+    print("Depth First Search")
+    puz.process_DFS()
+    
